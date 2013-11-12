@@ -1,0 +1,65 @@
+/*
+* (C) Copyright 1997 i-Teco, CJSK. All Rights reserved.
+* i-Teco PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+*
+* Эксклюзивные права 1997 i-Teco, ЗАО.
+* Данные исходные коды не могут использоваться и быть изменены
+* без официального разрешения компании i-Teco.          
+*/
+package my.project.concurrency.ekkel;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * <h3></h3>
+ * <p></p>
+ * <p>Author: predtechenskaya (predtechenskaya@i-teco.ru)</p>
+ * <p>Date: 08.11.13</p>
+ */
+public class SimpleRunnable implements Runnable {
+    private static int taskCnt = 0;
+    private final int id = taskCnt++;
+
+    private int count = 10;
+    public SimpleRunnable(){}
+    public SimpleRunnable(int cnt){
+        count = cnt;
+    }
+
+    public void print(){
+        System.out.println("#" + id + " " +count);
+    }
+
+    @Override
+    public void run() {
+        while(count-- > 0){
+            print();
+            Thread.yield();
+        }
+    }
+
+    public static void threadrunning(){
+        for(int i=0;i<countThreads;i++){
+            new Thread(new SimpleRunnable()).start();
+        }
+    }
+
+    /**
+     *      Executor - промежуточный слой между Runnable и Thread
+     *      Предоставляет API для управления потоками из коробки, например, количество потоков
+     */
+    public static void executorsrunning(){
+        ExecutorService exec = Executors.newCachedThreadPool();
+        for(int i=0;i<countThreads;i++){
+            exec.execute(new SimpleRunnable());
+        }
+        exec.shutdown();
+    }
+
+    public static void main(String[] args) {
+        executorsrunning();
+    }
+
+    public static final int countThreads = 5;
+}
